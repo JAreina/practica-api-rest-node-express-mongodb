@@ -12,19 +12,21 @@ block content
 				table.table
 					tr
 						th Número
+						th clave
 						th Nombre
 						th Correo
 						th Ciudad
 					each d in data
 						tr
-							td #{d.id}
+							td #{d._id}
+							td #{d.clave}
 							td #{d.nombre}
 							td #{d.correo}
 							td #{d.ciudad}
 							td
-								a.button.edit(href="/editar/"+d.id) EDITAR
+								a.button.edit(href="/editar/"+d._id.toString()) EDITAR
 							td
-								form(enctype="application/x-www-form-urlencoded", method="post", action="/eliminar/" + d.id)
+								form(method="post", action="/eliminar/" + d._id.toString())
 									input(type="hidden", name="_method", value="DELETE")
 									input.button.delete(type="button", value="Eliminar", onclick="eliminar(this)")
 				script.

@@ -1,31 +1,74 @@
 "use strict";
 
-const conn = require('./conexion');
+const conn = require("./usuario-schema"); // conexion a mongo
 
-class UsuarioModel{
-	getTodo(cb){
-            conn.query("select * from usuario",cb);
-	}
+class UsuarioModel {
 
-	getUno(id,cb){
-conn.query('select  *  from usuario  where id = ?',id,cb);
-	}
+  // FUNCION QUE EJECUTA EL CONTROLLADOR
+  getTodo(cb) {
+    conn.find({}, (err, docs) => {
+      console.log(docs   +"MODELO");
+      if (err) {
+        throw err;
+      } else {
+        cb(err,docs); // callback 
+      }
+    }); // objeto vacio trae todo de la base de datos
+  }
 
-//si no existe insert, si no actualiza
-   save(data,cb){
-conn.query('select * from usuario where id = ?', data.id, (err, rows) => {
-			console.log(`Número de registros: ${rows.length}`);
 
-			if(!err)
-				return ( rows.length == 1 )
-					? conn.query('update usuario SET ? where id = ?', [data, data.id], cb)
-					: conn.query('insert into usuario SET ?', data, cb);
-		});
-   }
+  // SELECCIONAR UN SOLO REGISTRO
+  getUno( _id, cb ) {
+    conn.findOne({ _id : _id }, (err,docs)=>{
+      if(err) throw err;
+			cb(_id,docs);
+    });
+  }
 
-   delete(id,cb){
-         conn.query('delete from usuario where id = ?',id, cb) ;
-         }
+  //si no existe insert, si no actualiza
+  save(data, cb) {
+      // objeto lo que debe traer de la bd
+          // buscar por ide y contar cuantos docs
+         conn.count({_id : data._id},(err,count)=>{
+                    //manejo de error 
+                   if(err)  throw err;
+                        console.log(`NÚMERO DOCS: ${count}`);
+
+                              // si no existe crea
+                   if(count == 0){
+                     conn.create(data, (err)=>{
+                       if (err) throw  err;
+                       cb()
+                     });
+                     // si existe actualiza
+                   }else if (count == 1){
+                        conn.findOneAndUpdate(
+                         
+                          { _id : data._id },
+                          {
+                            clave : data.clave,
+                            nombre : data.nombre,
+                            correo : data.correo,
+                            ciudad : data.ciudad
+                          },
+                          (err)=>{
+                                 if(err)  throw (err);
+                                 cb();
+                          }
+                        )
+                   }
+         });
+
+
+
+  }
+
+  delete( _id, cb ) {
+    conn.remove({ _id : _id}, (err)=>{
+               if(err) throw err;
+               cb();
+    });
+  }
 }
 
 module.exports = UsuarioModel;

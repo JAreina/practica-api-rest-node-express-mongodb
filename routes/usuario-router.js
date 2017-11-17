@@ -10,9 +10,9 @@ router
           .get('/', uc.getTodo )
          .get('/agregar',uc.addForm)
           .post('/', uc.save)
-           .get('/editar/:id', uc.getUno)
-          .put('/actualizar/:id', uc.save)
-        .delete('/eliminar/:id', uc.delete)
+           .get('/editar/:_id', uc.getUno)
+          .put('/actualizar/:_id', uc.save)
+        .delete('/eliminar/:_id', uc.delete)
          .use(uc.error);
 
 
